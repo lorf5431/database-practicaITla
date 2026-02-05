@@ -1,0 +1,88 @@
+create database practicaITla;
+use practicaITla;
+go
+
+
+
+CREATE TABLE fuente_dato (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    idFuente INT NOT NULL,
+    TipoFuente VARCHAR(100) NOT NULL,
+    FechaCarga DATETIME DEFAULT GETDATE()
+);
+
+
+CREATE TABLE clients (
+    client_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL
+);
+
+
+CREATE TABLE products (
+    product_id INT IDENTITY(1,1) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    categoria VARCHAR(100) NOT NULL
+);
+
+
+CREATE TABLE social_comments (
+    comment_id INT IDENTITY(1,1) PRIMARY KEY,
+    client_id INT NOT NULL,
+    product_id INT NOT NULL,
+    platform VARCHAR(100) NOT NULL,
+    comment_text TEXT NOT NULL,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    timestamp DATETIME DEFAULT GETDATE(),
+    
+    CONSTRAINT FK_SocialComments_Clients 
+        FOREIGN KEY (client_id) REFERENCES clients(client_id),
+    CONSTRAINT FK_SocialComments_Products 
+        FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+
+CREATE TABLE web_reviews (
+    review_id INT IDENTITY(1,1) PRIMARY KEY,
+    client_id INT NOT NULL,
+    product_id INT NOT NULL,
+    fuente VARCHAR(100) NOT NULL,
+    fecha DATE NOT NULL,
+    comentario TEXT NOT NULL,
+    
+    CONSTRAINT FK_WebReviews_Clients 
+        FOREIGN KEY (client_id) REFERENCES clients(client_id),
+    CONSTRAINT FK_WebReviews_Products 
+        FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+
+CREATE TABLE surveys_part1 (
+    survey_id INT IDENTITY(1,1) PRIMARY KEY,
+    client_id INT NOT NULL,
+    idProducto INT NOT NULL,
+    fecha DATE NOT NULL,
+    comentario TEXT NOT NULL,
+    clasificacion VARCHAR(50) NOT NULL,
+    puntajeSastifacion FLOAT CHECK (puntajeSastifacion BETWEEN 0 AND 10),
+    
+    CONSTRAINT FK_Surveys_Clients 
+        FOREIGN KEY (client_id) REFERENCES clients(client_id),
+    CONSTRAINT FK_Surveys_Products 
+        FOREIGN KEY (idProducto) REFERENCES products(product_id)
+);
+
+
+SELECT TOP(5) * FROM fuente_dato;
+SELECT TOP(5) * FROM clients;
+SELECT TOP(5) * FROM products;
+SELECT TOP(5) * FROM social_comments;
+SELECT TOP(5) * FROM web_reviews;
+SELECT TOP(5) * FROM surveys_part1;
+
+
+SELECT COUNT(*) FROM clients;
+SELECT COUNT(*) FROM products;
+SELECT COUNT(*) FROM social_comments;
+SELECT COUNT(*) FROM web_reviews;
+SELECT COUNT(*) FROM surveys_part1;
