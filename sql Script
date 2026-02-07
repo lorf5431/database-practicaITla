@@ -1,23 +1,15 @@
-create database practicaITla;
-use practicaITla;
-go
 
+CREATE DATABASE GestionFeedback;
+GO
 
-
-CREATE TABLE fuente_dato (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    idFuente INT NOT NULL,
-    TipoFuente VARCHAR(100) NOT NULL,
-    FechaCarga DATETIME DEFAULT GETDATE()
-);
-
+USE GestionFeedback;
+GO
 
 CREATE TABLE clients (
     client_id INT IDENTITY(1,1) PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL
 );
-
 
 CREATE TABLE products (
     product_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -26,38 +18,7 @@ CREATE TABLE products (
 );
 
 
-CREATE TABLE social_comments (
-    comment_id INT IDENTITY(1,1) PRIMARY KEY,
-    client_id INT NOT NULL,
-    product_id INT NOT NULL,
-    platform VARCHAR(100) NOT NULL,
-    comment_text TEXT NOT NULL,
-    rating INT CHECK (rating BETWEEN 1 AND 5),
-    timestamp DATETIME DEFAULT GETDATE(),
-    
-    CONSTRAINT FK_SocialComments_Clients 
-        FOREIGN KEY (client_id) REFERENCES clients(client_id),
-    CONSTRAINT FK_SocialComments_Products 
-        FOREIGN KEY (product_id) REFERENCES products(product_id)
-);
-
-
-CREATE TABLE web_reviews (
-    review_id INT IDENTITY(1,1) PRIMARY KEY,
-    client_id INT NOT NULL,
-    product_id INT NOT NULL,
-    fuente VARCHAR(100) NOT NULL,
-    fecha DATE NOT NULL,
-    comentario TEXT NOT NULL,
-    
-    CONSTRAINT FK_WebReviews_Clients 
-        FOREIGN KEY (client_id) REFERENCES clients(client_id),
-    CONSTRAINT FK_WebReviews_Products 
-        FOREIGN KEY (product_id) REFERENCES products(product_id)
-);
-
-
-CREATE TABLE surveys_part1 (
+CREATE TABLE surveys (
     survey_id INT IDENTITY(1,1) PRIMARY KEY,
     client_id INT NOT NULL,
     idProducto INT NOT NULL,
@@ -72,17 +33,59 @@ CREATE TABLE surveys_part1 (
         FOREIGN KEY (idProducto) REFERENCES products(product_id)
 );
 
-
-SELECT TOP(5) * FROM fuente_dato;
-SELECT TOP(5) * FROM clients;
-SELECT TOP(5) * FROM products;
-SELECT TOP(5) * FROM social_comments;
-SELECT TOP(5) * FROM web_reviews;
-SELECT TOP(5) * FROM surveys_part1;
+CREATE TABLE fuentes (
+    fuente_id INT IDENTITY(1,1) PRIMARY KEY,
+    tipo_fuente VARCHAR(100) NOT NULL
+);
 
 
-SELECT COUNT(*) FROM clients;
-SELECT COUNT(*) FROM products;
-SELECT COUNT(*) FROM social_comments;
-SELECT COUNT(*) FROM web_reviews;
-SELECT COUNT(*) FROM surveys_part1;
+CREATE TABLE fuente_dato (
+    carga_id INT IDENTITY(1,1) PRIMARY KEY,
+    fuente_id INT NOT NULL,
+    fecha_carga DATETIME DEFAULT GETDATE(),
+
+    CONSTRAINT FK_FuenteDato_Fuentes
+        FOREIGN KEY (fuente_id) REFERENCES fuentes(fuente_id)
+);
+
+
+CREATE TABLE platforms (
+    platform_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+
+
+CREATE TABLE social_comments (
+    comment_id INT IDENTITY(1,1) PRIMARY KEY,
+    client_id INT NOT NULL,
+    product_id INT NOT NULL,
+    platform_id INT NOT NULL,
+    comment_text TEXT NOT NULL,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    fecha DATETIME DEFAULT GETDATE(),
+
+    CONSTRAINT FK_SocialComments_Clients 
+        FOREIGN KEY (client_id) REFERENCES clients(client_id),
+    CONSTRAINT FK_SocialComments_Products 
+        FOREIGN KEY (product_id) REFERENCES products(product_id),
+    CONSTRAINT FK_SocialComments_Platforms
+        FOREIGN KEY (platform_id) REFERENCES platforms(platform_id)
+);
+
+
+CREATE TABLE web_reviews (
+    review_id INT IDENTITY(1,1) PRIMARY KEY,
+    client_id INT NOT NULL,
+    product_id INT NOT NULL,
+    fuente_id INT NOT NULL,
+    fecha DATE NOT NULL,
+    comentario TEXT NOT NULL,
+
+    CONSTRAINT FK_WebReviews_Clients 
+        FOREIGN KEY (client_id) REFERENCES clients(client_id),
+    CONSTRAINT FK_WebReviews_Products 
+        FOREIGN KEY (product_id) REFERENCES products(product_id),
+    CONSTRAINT FK_WebReviews_Fuentes
+        FOREIGN KEY (fuente_id) REFERENCES fuentes(fuente_id)
+);
